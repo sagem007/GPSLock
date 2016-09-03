@@ -45,8 +45,8 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 import butterknife.OnClick;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
