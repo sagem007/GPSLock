@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">GPSLock</string>
+    <string name="latitude_label">Latitude</string>
+    <string name="longitude_label">Longitude</string>
+    <string name="altitude_label">Altitude</string>
+    <string name="bearing_label">Bearing</string>
+    <string name="accuracy_label">Accuracy</string>
+    <string name="date_label">Date</string>
+    <string name="speed_label">Speed</string>
+
+    <string name="city_label">City</string>
+    <string name="postalcode_label">Pincode</string>
+</resources>
