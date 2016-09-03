@@ -43,6 +43,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -75,21 +78,20 @@ public class MainActivity extends AppCompatActivity implements
     public static final long FASTEST_UPDATE_INTERVAL =
             UPDATE_INTERVAL / 2;
 
-    protected Button
-            btn_start_fused_location,
-            btn_permissions,
-            btn_stop_fused_location,
-            btn_send_fused_location;
-    protected TextView
-            mPostalcodeTextView,
-            mCityTextView,
-            mDateTextView,
-            mLatitudeTextView,
-            mLongitudeTextView,
-            mSpeedTextView,
-            mBearingTextView,
-            mAltitudeTextView,
-            mAccuracyTextView;
+    @BindView(R.id.btn_start_fused_location) Button btn_start_fused_location;
+    @BindView(R.id.btn_grant_permission) Button btn_grant_permission;
+    @BindView(R.id.btn_stop_fused_location) Button btn_stop_fused_location;
+    @BindView(R.id.btn_send_fused_location) Button btn_send_fused_location;
+
+    @BindView(R.id.mPostalcodeTextView) TextView mPostalcodeTextView;
+    @BindView(R.id.mCityTextView) TextView mCityTextView;
+    @BindView(R.id.mDateTextView) TextView mDateTextView;
+    @BindView(R.id.mLatitudeTextView) TextView mLatitudeTextView;
+    @BindView(R.id.mLongitudeTextView) TextView mLongitudeTextView;
+    @BindView(R.id.mSpeedTextView) TextView mSpeedTextView;
+    @BindView(R.id.mBearingTextView) TextView mBearingTextView;
+    @BindView(R.id.mAltitudeTextView) TextView mAltitudeTextView;
+    @BindView(R.id.mAccuracyTextView) TextView mAccuracyTextView;
 
     // Обеспечивает точку входа для служб Google Play
     protected GoogleApiClient mGoogleApiClient;
@@ -108,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements
     // Флаг состояние запроса обновлений информации о местоположении
     // Значение изменяется, когда пользователь нажимает кнопки StartLocation и StopLocation
     protected Boolean mRequestingLocationUpdates;
-
 
     @Override
     protected void onStart() {
@@ -160,11 +161,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        btn_send_fused_location = (Button) findViewById(R.id.btn_send_fused_location);
-        btn_permissions = (Button) findViewById(R.id.btn_grant_permission);
-        btn_start_fused_location = (Button) findViewById(R.id.btn_start_fused_location);
-        btn_stop_fused_location = (Button) findViewById(R.id.btn_stop_fused_location);
+        ButterKnife.bind(this);
 
         mLatitudeTextView = (TextView) findViewById(R.id.mLatitudeTextView);
         mLongitudeTextView = (TextView) findViewById(R.id.mLongitudeTextView);
@@ -223,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        btn_permissions.setOnClickListener(new View.OnClickListener() {
+        btn_grant_permission.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (
