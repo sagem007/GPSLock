@@ -79,14 +79,14 @@ public class MainActivity extends AppCompatActivity implements
     public static final long FASTEST_UPDATE_INTERVAL =
             UPDATE_INTERVAL / 2;
 
-    @BindView(R.id.btn_start_fused_location)
+/*    @BindView(R.id.btn_start_fused_location)
     Button btn_start_fused_location;
     @BindView(R.id.btn_grant_permission)
     Button btn_grant_permission;
     @BindView(R.id.btn_stop_fused_location)
     Button btn_stop_fused_location;
     @BindView(R.id.btn_send_fused_location)
-    Button btn_send_fused_location;
+    Button btn_send_fused_location; */
 
     @BindView(R.id.mPostalcodeTextView)
     TextView mPostalcodeTextView;
