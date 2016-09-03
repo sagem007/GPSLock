@@ -45,6 +45,7 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -78,20 +79,33 @@ public class MainActivity extends AppCompatActivity implements
     public static final long FASTEST_UPDATE_INTERVAL =
             UPDATE_INTERVAL / 2;
 
-    @BindView(R.id.btn_start_fused_location) Button btn_start_fused_location;
-    @BindView(R.id.btn_grant_permission) Button btn_grant_permission;
-    @BindView(R.id.btn_stop_fused_location) Button btn_stop_fused_location;
-    @BindView(R.id.btn_send_fused_location) Button btn_send_fused_location;
+    @BindView(R.id.btn_start_fused_location)
+    Button btn_start_fused_location;
+    @BindView(R.id.btn_grant_permission)
+    Button btn_grant_permission;
+    @BindView(R.id.btn_stop_fused_location)
+    Button btn_stop_fused_location;
+    @BindView(R.id.btn_send_fused_location)
+    Button btn_send_fused_location;
 
-    @BindView(R.id.mPostalcodeTextView) TextView mPostalcodeTextView;
-    @BindView(R.id.mCityTextView) TextView mCityTextView;
-    @BindView(R.id.mDateTextView) TextView mDateTextView;
-    @BindView(R.id.mLatitudeTextView) TextView mLatitudeTextView;
-    @BindView(R.id.mLongitudeTextView) TextView mLongitudeTextView;
-    @BindView(R.id.mSpeedTextView) TextView mSpeedTextView;
-    @BindView(R.id.mBearingTextView) TextView mBearingTextView;
-    @BindView(R.id.mAltitudeTextView) TextView mAltitudeTextView;
-    @BindView(R.id.mAccuracyTextView) TextView mAccuracyTextView;
+    @BindView(R.id.mPostalcodeTextView)
+    TextView mPostalcodeTextView;
+    @BindView(R.id.mCityTextView)
+    TextView mCityTextView;
+    @BindView(R.id.mDateTextView)
+    TextView mDateTextView;
+    @BindView(R.id.mLatitudeTextView)
+    TextView mLatitudeTextView;
+    @BindView(R.id.mLongitudeTextView)
+    TextView mLongitudeTextView;
+    @BindView(R.id.mSpeedTextView)
+    TextView mSpeedTextView;
+    @BindView(R.id.mBearingTextView)
+    TextView mBearingTextView;
+    @BindView(R.id.mAltitudeTextView)
+    TextView mAltitudeTextView;
+    @BindView(R.id.mAccuracyTextView)
+    TextView mAccuracyTextView;
 
     // Обеспечивает точку входа для служб Google Play
     protected GoogleApiClient mGoogleApiClient;
@@ -157,23 +171,67 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @OnClick(R.id.btn_start_fused_location)
+    void start_click() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            //step 4
+            checkLocationSettings();
+        }
+    }
+
+    @OnClick(R.id.btn_send_fused_location)
+    void send_click() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+
+            new SendLocationsTask().execute();
+        }
+    }
+
+    @OnClick(R.id.btn_stop_fused_location)
+    void stop_click() {
+        if (mGoogleApiClient.isConnected()) {
+            stopLocation();
+        }
+    }
+
+    @OnClick(R.id.btn_grant_permission)
+    void permission_click() {
+        if (
+                ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(MainActivity.this,
+                                Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(MainActivity.this,
+                                Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.INTERNET,
+                            Manifest.permission.READ_PHONE_STATE
+                    },
+                    CODE_REQUEST_ACCESS_PERMISSION);
+        } else if (
+                ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(MainActivity.this,
+                                Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(MainActivity.this,
+                                Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getApplicationContext(), "Permissions already was granted.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        mLatitudeTextView = (TextView) findViewById(R.id.mLatitudeTextView);
-        mLongitudeTextView = (TextView) findViewById(R.id.mLongitudeTextView);
-        mSpeedTextView = (TextView) findViewById(R.id.mSpeedTextView);
-        mBearingTextView = (TextView) findViewById(R.id.mBearingTextView);
-        mAccuracyTextView = (TextView) findViewById(R.id.mAccuracyTextView);
-        mAltitudeTextView = (TextView) findViewById(R.id.mAltitudeTextView);
-        mDateTextView = (TextView) findViewById(R.id.mDateTextView);
-
-        // Дополнительная информация
-        mCityTextView = (TextView) findViewById(R.id.mCityTextView);
-        mPostalcodeTextView = (TextView) findViewById(R.id.mPostalcodeTextView);
 
         mRequestingLocationUpdates = false;
 
@@ -185,69 +243,6 @@ public class MainActivity extends AppCompatActivity implements
 
         //step 3
         buildLocationSettingsRequest();
-
-        btn_start_fused_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                    //step 4
-                    checkLocationSettings();
-                }
-            }
-        });
-
-        btn_send_fused_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(MainActivity.this,
-                                Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-
-                    new SendLocationsTask().execute();
-                }
-            }
-        });
-
-        btn_stop_fused_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mGoogleApiClient.isConnected()) {
-                    stopLocation();
-                }
-            }
-        });
-
-        btn_grant_permission.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (
-                        ContextCompat.checkSelfPermission(MainActivity.this,
-                                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(MainActivity.this,
-                                        Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(MainActivity.this,
-                                        Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[]{
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.INTERNET,
-                                    Manifest.permission.READ_PHONE_STATE
-                            },
-                            CODE_REQUEST_ACCESS_PERMISSION);
-                } else if (
-                        ContextCompat.checkSelfPermission(MainActivity.this,
-                                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                                ContextCompat.checkSelfPermission(MainActivity.this,
-                                        Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
-                                ContextCompat.checkSelfPermission(MainActivity.this,
-                                        Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getApplicationContext(), "Permissions already was granted.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
     }
 
     // step 1
